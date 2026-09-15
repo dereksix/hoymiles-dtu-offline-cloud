@@ -1,0 +1,18 @@
+# Example systemd unit — edit WorkingDirectory/User, then:
+#   sudo cp hoymiles-cloud.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now hoymiles-cloud
+[Unit]
+Description=Hoymiles DTU offline cloud emulator
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/hoymiles-dtu-offline-cloud
+ExecStart=/usr/bin/python3 /opt/hoymiles-dtu-offline-cloud/cloud_emu.py
+Environment=EMU_LOG=/var/log/hoymiles-emu.log
+Environment=EMU_INJECT=/opt/hoymiles-dtu-offline-cloud/inject.cmd
+Restart=always
+RestartSec=5
+User=nobody
+
+[Install]
+WantedBy=multi-user.target
