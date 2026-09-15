@@ -1,0 +1,3 @@
+# cloud_emu.py has NO dependencies — pure Python stdlib.
+# Only the AP tools (commission.py, set_server.py) need this:
+hoymiles-wifi
