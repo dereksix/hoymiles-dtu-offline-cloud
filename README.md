@@ -64,13 +64,26 @@ Three independent pieces — use what you need.
 Join the DTU's own open Wi‑Fi AP `DTUP-<serialtail>` (gateway `10.10.100.254`), then:
 
 ```bash
-pip install hoymiles-wifi
-python commission.py --host 10.10.100.254 --local-addr <your-AP-ip> \
-    --dtu-sn <DTU_SERIAL> --mi <MI_SERIAL_INT> --mi <MI_SERIAL_INT>
+# read-only: what does the DTU already have registered?
+python3 networking.py --local-addr <your-AP-ip> --dtu-sn <DTU_SERIAL>
+
+# register the COMPLETE inverter list (this replaces the whole inventory)
+python3 networking.py --local-addr <your-AP-ip> --dtu-sn <DTU_SERIAL> --apply --replace-inventory --mi 1146A0283A50 --mi 1146A0283522
 ```
-Microinverter serials are the 12 hex digits on the sticker, passed as ints —
-`int("112100ABCDEF", 16)`. The DTU binds them over its sub‑1 GHz radio (they must be
-**powered by their panels** to answer).
+Serials are the 12 hex digits on the sticker (pass as-is, or the decimal integer).
+`networking.py` is **standard-library only** - no `pip install`.
+
+> **Do NOT use AutoSearch - it false-positives.** The obvious `AutoSearch` message
+> (`0xa313`) does **not** commission, yet it looks like it worked: `hoymiles-wifi`
+> validates the frame CRC but **not** that the reply answers the command you sent, so an
+> unrelated cached APP-info frame parses as `AutoSearchResDTO` with `error_code: 0` - a
+> false positive that fooled an earlier version of this repo. The real command is
+> **`ID_NETWORKING` (action 16)**; `networking.py` sends it and verifies the response
+> command + sequence before trusting anything.
+
+> **No AC needed to commission.** Inverters register and report DC/PV telemetry on **solar
+> alone** - grid AC is only needed to actually *export*. They sit in a flashing-red
+> "no-grid" fault until AC is connected, but that does **not** block commissioning.
 </details>
 
 <details open>
@@ -122,7 +135,7 @@ Verified on a **DTU‑Pro‑S** (`fw 2.3.0.0-de`, `sw 527`) with **HMS‑800‑2
 - ✅ DTU→cloud handshake decoded (register / time / APPInfo / heartbeat)
 - ✅ Emulator a real OEM DTU accepts and stays online against — no Hoymiles, no internet
 - ✅ Command push over Ethernet — reboot verified end‑to‑end
-- ✅ Account‑free `AutoSearch` commissioning over the DTU AP
+- ✅ Account‑free commissioning over the DTU AP via **`ID_NETWORKING`** (not AutoSearch — that false-positives)
 - ⚠️ **TODO:** decode live `RealData` production frames (needs a DTU with bound
   inverters); more models/firmwares; a cleaner injector API
 

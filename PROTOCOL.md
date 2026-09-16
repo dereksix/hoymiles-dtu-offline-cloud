@@ -68,8 +68,16 @@ Common actions (`CMD_ACTION_*`):
 | 4  | collect versions |
 | 50 | alarm list |
 
-Provisioning uses a different message (`AutoSearch`, `mi_serial_numbers` repeated int64);
-over the local AP it's command `0xa313`. See `commission.py`.
+**Provisioning / commissioning** is `CommandResDTO` action **16 (`ID_NETWORKING`)**, NOT
+AutoSearch. Payload: `dev_kind=1`, `package_nub=1`, `package_now=0` (omit the zero),
+unique `tid`, `system_total_a=<count>`, and the serials as packed varints in
+`mi_sn_item_a` (field 13) - a COMPLETE inventory replacement. The DTU restarts and
+re-uploads its inventory. See `networking.py`.
+
+> **Warning:** `AutoSearch` (`0xa313`) does NOT commission and returns a false
+> `error_code: 0` because clients that don't match the response command/sequence will
+> parse an unrelated cached APP-info frame as the expected reply. Always verify the
+> response `cmd == request - 0x100` and the echoed `seq` before trusting a reply.
 
 ## Reproducing the capture
 
