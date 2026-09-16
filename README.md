@@ -68,7 +68,7 @@ Join the DTU's own open Wi‑Fi AP `DTUP-<serialtail>` (gateway `10.10.100.254`)
 python3 networking.py --local-addr <your-AP-ip> --dtu-sn <DTU_SERIAL>
 
 # register the COMPLETE inverter list (this replaces the whole inventory)
-python3 networking.py --local-addr <your-AP-ip> --dtu-sn <DTU_SERIAL> --apply --replace-inventory --mi 1146A0283A50 --mi 1146A0283522
+python3 networking.py --local-addr <your-AP-ip> --dtu-sn <DTU_SERIAL> --apply --replace-inventory --mi 1146A0000001 --mi 1146A0000002
 ```
 Serials are the 12 hex digits on the sticker (pass as-is, or the decimal integer).
 `networking.py` is **standard-library only** - no `pip install`.
